@@ -293,9 +293,11 @@ module LogStashLogger
     end
 
     def flush_timer_thread
+      parent_thread = Thread.current
       @flush_timer_thread ||=
         Thread.new do
           loop do
+            break unless parent_thread.alive?
             sleep(@buffer_config[:max_interval])
             begin
               buffer_flush(:force => true)
